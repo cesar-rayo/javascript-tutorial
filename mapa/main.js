@@ -17,8 +17,8 @@ var teclas = {
 var dibujo = document.getElementById("mapa");
 var contexto = dibujo.getContext("2d");
 
-var cerdoX;
-var cerdoY;
+var cerdoX = customRandom(0, 7) * 60;
+var cerdoY = customRandom(0, 7) * 60;
 document.addEventListener("keydown", moverCerdo);
 
 var mapa = {
@@ -28,24 +28,24 @@ var mapa = {
 
 var vaca = {
   url: "./imagenes/vaca.png",
-  loaded: false
+  loaded: false,
+  ejeX: 0,
+  ejeY: 0
 }
 
 var cerdo = {
   url: "./imagenes/cerdo.png",
-  loaded: false
+  loaded: false,
+  ejeX: 0,
+  ejeY: 0
 }
 
 var pollo = {
   url: "./imagenes/pollo.png",
-  loaded: false
+  loaded: false,
+  ejeX: 0,
+  ejeY: 0
 }
-
-var cantVacas = customRandom(0,5);
-var cantPollos = customRandom(0,5);
-
-console.log("Vacas: " + cantVacas);
-console.log("Pollos: " + cantPollos);
 
 mapa.imagen = loadImage(mapa.url);
 mapa.imagen.addEventListener("load", cargarMapa);
@@ -58,6 +58,27 @@ pollo.imagen.addEventListener("load", cargarPollos);
 
 cerdo.imagen = loadImage(cerdo.url);
 cerdo.imagen.addEventListener("load", cargarCerdos);
+
+var cantVacas = customRandom(1,5);
+var cantPollos = customRandom(1,10);
+
+var vacasCoordenadas = crearCoordenadas(cantVacas);
+var pollosCoordenadas = crearCoordenadas(cantPollos);
+
+
+function crearCoordenadas(cantidad){
+  var lista = [];
+  for(var i = 0; i < cantidad; i++){
+    var x0 = customRandom(0, 7) * 60;
+    var y0 = customRandom(0, 7) * 60;
+    var coordenada = {
+      ejeX: x0,
+      ejeY: y0
+    }
+    lista.push(coordenada);
+  }
+  return lista;
+}
 
 function loadImage(src_path){
   var image = new Image();
@@ -91,35 +112,24 @@ function cargarCerdos(){
   dibujarMapa();
 }
 
-function dibujaEnCuadrilla(imagen){
-  var x = customRandom(0, 7);
-  var y = customRandom(0, 7);
-  x = x * 60;
-  y = y * 60;
-  contexto.drawImage(imagen, x, y);
-}
-
 function dibujarMapa(){
   if(mapa.loaded){
     contexto.drawImage(mapa.imagen, 0, 0);
   }
   if(vaca.loaded){
-    // Mapa de 500*500 imagenes de 80*80 limites 0-420
+    // Dibujar vacas
     for(var i=0; i < cantVacas; i++){
-      dibujaEnCuadrilla(vaca.imagen);
+      contexto.drawImage(vaca.imagen,vacasCoordenadas[i].ejeX, vacasCoordenadas[i].ejeY);
+    }
+  }
+  if(pollo.loaded){
+    // Dibujar pollos
+    for(var i=0; i < cantPollos; i++){
+      contexto.drawImage(pollo.imagen,pollosCoordenadas[i].ejeX, pollosCoordenadas[i].ejeY);
     }
   }
   if(cerdo.loaded){
-    cerdoX = customRandom(0, 7);
-    cerdoY = customRandom(0, 7);
-    cerdoX = cerdoX * 60;
-    cerdoY = cerdoY * 60;
     contexto.drawImage(cerdo.imagen, cerdoX, cerdoY);
-  }
-  if(pollo.loaded){
-    for(var i=0; i < cantPollos; i++){
-      dibujaEnCuadrilla(pollo.imagen);
-    }
   }
 }
 
@@ -128,19 +138,19 @@ function moverCerdo(evento){
   switch(evento.keyCode){
     case teclas.LEFT:
       cerdoX = cerdoX - distancia;
-      contexto.drawImage(cerdo.imagen, cerdoX, cerdoY);
+      dibujarMapa();
     break;
     case teclas.UP:
       cerdoY = cerdoY - distancia;
-      contexto.drawImage(cerdo.imagen, cerdoX, cerdoY);
+      dibujarMapa();
     break;
     case teclas.RIGHT:
       cerdoX = cerdoX + distancia;
-      contexto.drawImage(cerdo.imagen, cerdoX, cerdoY);
+      dibujarMapa();
     break;
     case teclas.DOWN:
       cerdoY = cerdoY + distancia;
-      contexto.drawImage(cerdo.imagen, cerdoX, cerdoY);
+      dibujarMapa();
     break;
   }
 }
